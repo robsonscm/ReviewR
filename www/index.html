@@ -31,49 +31,88 @@
 </head>
 <body>
     <header class="bar bar-nav">
-        <a class="btn btn-link btn-nav pull-right" href="#personModal" id="add-person">
-            <span class="icon icon-plus"></span>
+        <a class="btn btn-link btn-nav pull-right" href="#newItem" id="add-item">
+            <span class="icon icon-star"></span>
         </a>
         <h1 class="title">StraViewR</h1>
     </header>
-    <div class="content" id="page-people">
-        <ul class="table-view" id="contact-list">
+    <div class="content" id="page-itens">
+        <ul class="table-view" id="item-list">
             <!---->
         </ul>
     </div>
     
-    <div id="personModal" class="modal">
+    <div id="newItem" class="modal">
         <header class="bar bar-nav">
-            <a class="icon icon-close pull-right" href="#personModal" id="close-modal-person"></a>
-            <h1 class="title">Person Edit/Add</h1>
+            <a class="icon icon-close pull-right" href="#newItem" id="close-modal-item"></a>
+            <h1 class="title">Add a Review</h1>
         </header>
         
         <div class="content">
             <div class="content-padded">
                 <form class="input-group">
                     <div class="input-row">
-                        <label>Full name</label>
-                        <input type="text" placeholder="First Last" id="fullName" name="fullName">
+                        <label>Item</label>
+                        <input type="text" placeholder="Item to Review" id="item" name="item">
                     </div>
-                    <div class="input-row">
-                        <label>D.O.B.</label>
-                        <input type="date" placeholder="dd/mm/yyyy" id="dateBirth" name="dateBirth">
-                    </div>
-                </form>
-                <p class="content-padded" id="btn-stack-person">
-                    <button class="btn btn-block btn-outlined" id="btn-close-person">
+                    <ul class="table-view">
+                        <li class="table-view-cell">
+                            Rating
+                            <div class="pull-right">
+                                <span class="icon icon-star"></span>
+                                <span class="icon icon-star"></span>
+                                <span class="icon icon-star"></span>
+                                <span class="icon icon-star"></span>
+                                <span class="icon icon-star"></span>
+                            </div>
+                        </li>
+                    </ul>
+                    <button class="btn btn-primary btn-block btn-outlined" id="btn-photo-item">
+                        <span class="icon icon-download"></span>
+                        Take a Picture
+                    </button>
+                    <button class="btn btn-positive btn-block btn-outlined" id="btn-ok-item">
+                        <span class="icon icon-plus"></span>
+                        Save
+                    </button>
+                    <button class="btn-negative btn-block btn-outlined" id="btn-close-item">
                         <span class="icon icon-close"></span>
                         Cancel
                     </button>
-                    <button class="btn btn-positive btn-block btn-outlined" id="btn-ok-person">
-                        <span class="icon icon-check"></span>
-                        Save
-                    </button>
-                    <button class="btn btn-negative btn-block btn-outlined" id="btn-del-person">
+                </form>
+            </div>
+        </div>
+    </div>
+    <!---->
+    <div id="itemReview" class="modal">
+        <header class="bar bar-nav">
+            <a class="icon icon-close pull-right" href="#itemReview" id="close-modal-person"></a>
+            <h1 class="title">StraViewR</h1>
+        </header>
+    
+        <div class="content">
+            <div class="card">
+                <ul class="table-view">
+                    <li class="table-view-divider">
+                        Item Name
+                    </li>
+                    <li class="table-view-cell">
+                        <img class="media-object" src="http://placehold.it/300x300">
+                    </li>
+                    <li class="table-view-divider">
+                        <span class="icon icon-star"></span>
+                        <span class="icon icon-star"></span>
+                        <span class="icon icon-star"></span>
+                        <span class="icon icon-star"></span>
+                        <span class="icon icon-star"></span>
+                    </li>
+                </ul>
+                <div class="content-padded">
+                    <button class="btn-outlined btn-block btn-negative" id="btn-delete-review">
                         <span class="icon icon-trash"></span>
                         Delete
                     </button>
-                </p>
+                </div>
             </div>
         </div>
     </div>

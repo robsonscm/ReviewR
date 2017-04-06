@@ -78,10 +78,9 @@ var app = {
     },
     
     setEventsModalPerson: function(){
-        document.getElementById("btn-ok-person").addEventListener("touchstart", app.savePerson);
-        document.getElementById("btn-close-person").addEventListener("touchstart", app.clickBtnClose);
-        document.getElementById("btn-del-person").addEventListener("touchstart", app.deletePerson);
-        document.getElementById("btn-del-person").style.display = "none";
+        document.getElementById("btn-ok-item").addEventListener("touchstart", app.savePerson);
+        document.getElementById("btn-close-item").addEventListener("touchstart", app.clickBtnClose);
+        document.getElementById("btn-photo-item").addEventListener("touchstart", app.deletePerson);
     },
     
     setEventsModalGift: function () {
@@ -90,7 +89,7 @@ var app = {
     },
 
     listPerson: function () {
-        let ul = document.getElementById("contact-list");
+        let ul = document.getElementById("item-list");
         ul.innerHTML = "";
     
         app.peopleList = rscmLib.getLocalStorage() || {"people": []};
@@ -108,8 +107,8 @@ var app = {
             //
             let li = rscmLib.createNewDOM({type: "li"   , class: "table-view-cell media", "data-id":person.id});
             let s1 = rscmLib.createNewDOM({type: "span" , class: "name"});
-            let a1 = rscmLib.createNewDOM({type: "a"    , class: "edit-person", innerHTML: person.fullName, href: "#personModal"});
-            let a2 = rscmLib.createNewDOM({type: "a"    , class: "navigate-right pull-right", href: "gifts.html"});
+            let a1 = rscmLib.createNewDOM({type: "a"    , class: "edit-person", innerHTML: person.fullName, href: "#newItem"});
+            let a2 = rscmLib.createNewDOM({type: "a"    , class: "navigate-right pull-right", href: "#itemReview"});
             let s2 = rscmLib.createNewDOM({type: "span" , class: "dob", innerHTML: person.dob });
             //
             s1.appendChild(a1);
@@ -223,29 +222,29 @@ var app = {
         let ul = document.getElementById("gift-list");
         ul.innerHTML = "";
         //
-        person[0].ideas.sort(function (a,b) {
-            return (a.idea > b.idea) ? 1 : (a.idea < b.idea) ? -1 : 0;
-        }).forEach(function (gift, index) {
-            //
-            let li = rscmLib.createNewDOM({type: "li"   , class: "table-view-cell media"});
-            let s1 = rscmLib.createNewDOM({type: "span" , class: "pull-right icon icon-trash midline", "data-id":index});
-            let dv = rscmLib.createNewDOM({type: "div"  , class: "media-body", innerHTML: gift.idea});
-            let p1 = rscmLib.createNewDOM({type: "p"    , innerHTML: gift.at});
-            let p2 = rscmLib.createNewDOM({type: "p"    });
-            let p3 = rscmLib.createNewDOM({type: "p"    , innerHTML: gift.cost});
-            let a1 = rscmLib.createNewDOM({type: "a"    , href: "http://".concat(gift.url), target: "_blank", innerHTML: gift.url});
-            //
-            p2.appendChild(a1);
-            dv.appendChild(p1);
-            dv.appendChild(p2);
-            dv.appendChild(p3);
-            li.appendChild(s1);
-            li.appendChild(dv);
-            ul.appendChild(li);
-            //
-            s1.addEventListener("touchend", app.deleteGift);
-            //
-        });
+        // person[0].ideas.sort(function (a,b) {
+        //     return (a.idea > b.idea) ? 1 : (a.idea < b.idea) ? -1 : 0;
+        // }).forEach(function (gift, index) {
+        //     //
+        //     let li = rscmLib.createNewDOM({type: "li"   , class: "table-view-cell media"});
+        //     let s1 = rscmLib.createNewDOM({type: "span" , class: "pull-right icon icon-trash midline", "data-id":index});
+        //     let dv = rscmLib.createNewDOM({type: "div"  , class: "media-body", innerHTML: gift.idea});
+        //     let p1 = rscmLib.createNewDOM({type: "p"    , innerHTML: gift.at});
+        //     let p2 = rscmLib.createNewDOM({type: "p"    });
+        //     let p3 = rscmLib.createNewDOM({type: "p"    , innerHTML: gift.cost});
+        //     let a1 = rscmLib.createNewDOM({type: "a"    , href: "http://".concat(gift.url), target: "_blank", innerHTML: gift.url});
+        //     //
+        //     p2.appendChild(a1);
+        //     dv.appendChild(p1);
+        //     dv.appendChild(p2);
+        //     dv.appendChild(p3);
+        //     li.appendChild(s1);
+        //     li.appendChild(dv);
+        //     ul.appendChild(li);
+        //     //
+        //     s1.addEventListener("touchend", app.deleteGift);
+        //     //
+        // });
         document.getElementById("name-person").innerHTML = person[0].fullName;
         (ul.innerHTML === "") ? ul.parentNode.style.display = "none" : ul.parentNode.style.display = "block";
     },
