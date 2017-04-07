@@ -18,32 +18,117 @@
     under the License.
 -->
 <html>
-    <head>
-        <!--
-        Customize this policy to fit your own app's needs. For more guidance, see:
-            https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
-        Some notes:
-            * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
-            * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
-            * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
-                * Enable inline JS: add 'unsafe-inline' to default-src
-        -->
-        <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">
-        <meta name="format-detection" content="telephone=no">
-        <meta name="msapplication-tap-highlight" content="no">
-        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
-        <link rel="stylesheet" type="text/css" href="css/index.css">
-        <title>Hello World</title>
-    </head>
-    <body>
-        <div class="app">
-            <h1>Apache Cordova</h1>
-            <div id="deviceready" class="blink">
-                <p class="event listening">Connecting to Device</p>
-                <p class="event received">Device is Ready</p>
+<head>
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self' data: gap: https://ssl.gstatic.com https://stra0165.edumedia.ca http://stra0165.edumedia.ca http://placehold.it 'unsafe-eval';
+          style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+          media-src *;
+          img-src 'self' data: content: assets-library://asset https://stra0165.edumedia.ca http://stra0165.edumedia.ca https://placehold.it https://placeholdit.imgix.net http://placehold.it http://placeholdit.imgix.net ;
+          font-src 'self' https://fonts.gstatic.com data:;">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+    
+    <link href="https://fonts.googleapis.com/css?family=Lato|Roboto" rel="stylesheet">
+    <link href="css/ratchet.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <title>StraViewR</title>
+</head>
+<body>
+    <header class="bar bar-nav" id="main-bar">
+        <a class="btn btn-link btn-nav pull-right" href="#newReview" id="add-review">
+            <span class="icon icon-plus"></span>
+        </a>
+        <h1 class="title">StraViewR</h1>
+    </header>
+    <div class="content" id="page-reviews">
+        <ul class="table-view" id="review-list">
+            <!---->
+        </ul>
+    </div>
+    <!---->
+    <div id="newReview" class="modal">
+        <header class="bar bar-nav">
+            <a class="icon icon-close pull-right" href="#newReview" id="close-modal-add"></a>
+            <h1 class="title">Add a Review</h1>
+        </header>
+        <!---->
+        <div class="content">
+            <div class="content-padded">
+                <form class="input-group">
+                    <div class="input-row">
+                        <label>Item</label>
+                        <input type="text" placeholder="Item to Review" id="name" name="name">
+                    </div>
+                    <ul class="table-view" id="review-form">
+                        <li class="table-view-cell">
+                            Rating
+                            <div class="pull-right" id="rating">
+                                <span class="icon icon-star" data-id="1"></span>
+                                <span class="icon icon-star" data-id="2"></span>
+                                <span class="icon icon-star" data-id="3"></span>
+                                <span class="icon icon-star" data-id="4"></span>
+                                <span class="icon icon-star" data-id="5"></span>
+                            </div>
+                        </li>
+                    </ul>
+                </form>
+                <button class="btn btn-primary btn-block" id="btn-photo-review">
+                    <span class="icon icon-download"></span>
+                    Take a Picture
+                </button>
+                <button class="btn btn-positive btn-block" id="btn-ok-review">
+                    <span class="icon icon-check"></span>
+                    Save
+                </button>
+                <button class="btn btn-block" id="btn-close-review">
+                    <span class="icon icon-close"></span>
+                    Cancel
+                </button>
             </div>
         </div>
-        <script type="text/javascript" src="cordova.js"></script>
-        <script type="text/javascript" src="js/index.js"></script>
-    </body>
+    </div>
+    <!---->
+    <div id="itemReview" class="modal">
+        <header class="bar bar-nav">
+            <a class="icon icon-down-nav pull-right" href="#itemReview" id="close-modal-review"></a>
+            <h1 class="title">StraViewR</h1>
+        </header>
+        <!---->
+        <div class="content">
+            <div class="card">
+                <ul class="table-view">
+                    <li class="table-view-divider" id="review_name">
+                        Item Name
+                    </li>
+                    <li class="table-view-cell" id="review-img">
+                        <img class="media-object" src="http://placehold.it/300x300">
+                    </li>
+                    <li class="table-view-cell" id="review-stars">
+                        <span class="icon icon-star"></span>
+                        <span class="icon icon-star"></span>
+                        <span class="icon icon-star"></span>
+                        <span class="icon icon-star"></span>
+                        <span class="icon icon-star"></span>
+                    </li>
+                    <li>
+                        <div class="content-padded">
+                            <button class="btn btn-block btn-negative" id="btn-delete-review">
+                                <span class="icon icon-trash"></span>
+                                Delete
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!---->
+    <script src="cordova.js"></script>
+    <script src="js/ratchet.min.js"></script>
+    <script src="js/moment-with-locales.min.js"></script>
+    <script src="js/rscmLib.js"></script>
+    <script src="js/app.js"></script>
+    <!---->
+</body>
 </html>

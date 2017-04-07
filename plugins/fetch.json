@@ -10,13 +10,10 @@
     "cordova-plugin-camera": {
         "source": {
             "type": "registry",
-            "id": "cordova-plugin-camera"
+            "id": "cordova-plugin-camera@~2.4.0"
         },
         "is_top_level": true,
-        "variables": {
-            "CAMERA_USAGE_DESCRIPTION": " ",
-            "PHOTOLIBRARY_USAGE_DESCRIPTION": " "
-        }
+        "variables": {}
     },
     "cordova-plugin-compat": {
         "source": {
@@ -44,6 +41,14 @@
             "id": "cordova-plugin-file"
         },
         "is_top_level": false,
+        "variables": {}
+    },
+    "cordova-plugin-device": {
+        "source": {
+            "type": "registry",
+            "id": "cordova-plugin-device@~1.1.5"
+        },
+        "is_top_level": true,
         "variables": {}
     }
 }
