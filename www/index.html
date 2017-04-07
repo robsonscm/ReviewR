@@ -30,89 +30,90 @@
     <title>StraViewR</title>
 </head>
 <body>
-    <header class="bar bar-nav">
-        <a class="btn btn-link btn-nav pull-right" href="#newItem" id="add-item">
-            <span class="icon icon-star"></span>
+    <header class="bar bar-nav" id="main-bar">
+        <a class="btn btn-link btn-nav pull-right" href="#newReview" id="add-review">
+            <span class="icon icon-plus"></span>
         </a>
         <h1 class="title">StraViewR</h1>
     </header>
-    <div class="content" id="page-itens">
-        <ul class="table-view" id="item-list">
+    <div class="content" id="page-reviews">
+        <ul class="table-view" id="review-list">
             <!---->
         </ul>
     </div>
     
-    <div id="newItem" class="modal">
+    <div id="newReview" class="modal">
         <header class="bar bar-nav">
-            <a class="icon icon-close pull-right" href="#newItem" id="close-modal-item"></a>
+            <a class="icon icon-close pull-right" href="#newReview" id="close-modal-add"></a>
             <h1 class="title">Add a Review</h1>
         </header>
-        
+        <!---->
         <div class="content">
             <div class="content-padded">
                 <form class="input-group">
                     <div class="input-row">
                         <label>Item</label>
-                        <input type="text" placeholder="Item to Review" id="item" name="item">
+                        <input type="text" placeholder="Item to Review" id="name" name="name">
                     </div>
                     <ul class="table-view">
                         <li class="table-view-cell">
                             Rating
-                            <div class="pull-right">
-                                <span class="icon icon-star"></span>
-                                <span class="icon icon-star"></span>
-                                <span class="icon icon-star"></span>
-                                <span class="icon icon-star"></span>
-                                <span class="icon icon-star"></span>
+                            <div class="pull-right" id="rating">
+                                <span class="icon icon-star" data-id="1"></span>
+                                <span class="icon icon-star" data-id="2"></span>
+                                <span class="icon icon-star" data-id="3"></span>
+                                <span class="icon icon-star" data-id="4"></span>
+                                <span class="icon icon-star" data-id="5"></span>
                             </div>
                         </li>
                     </ul>
-                    <button class="btn btn-primary btn-block btn-outlined" id="btn-photo-item">
-                        <span class="icon icon-download"></span>
-                        Take a Picture
-                    </button>
-                    <button class="btn btn-positive btn-block btn-outlined" id="btn-ok-item">
-                        <span class="icon icon-plus"></span>
-                        Save
-                    </button>
-                    <button class="btn-negative btn-block btn-outlined" id="btn-close-item">
-                        <span class="icon icon-close"></span>
-                        Cancel
-                    </button>
                 </form>
+                <button class="btn btn-primary btn-block" id="btn-photo-review">
+                    <span class="icon icon-download"></span>
+                    Take a Picture
+                </button>
+                <button class="btn btn-positive btn-block" id="btn-ok-review">
+                    <span class="icon icon-check"></span>
+                    Save
+                </button>
+                <button class="btn btn-block" id="btn-close-review">
+                    <span class="icon icon-close"></span>
+                    Cancel
+                </button>
             </div>
         </div>
     </div>
     <!---->
     <div id="itemReview" class="modal">
         <header class="bar bar-nav">
-            <a class="icon icon-close pull-right" href="#itemReview" id="close-modal-person"></a>
+            <a class="icon icon-down-nav pull-right" href="#itemReview" id="close-modal-review"></a>
             <h1 class="title">StraViewR</h1>
         </header>
-    
         <div class="content">
             <div class="card">
                 <ul class="table-view">
-                    <li class="table-view-divider">
+                    <li class="table-view-divider" id="review_name">
                         Item Name
                     </li>
-                    <li class="table-view-cell">
+                    <li class="table-view-cell" id="review-img">
                         <img class="media-object" src="http://placehold.it/300x300">
                     </li>
-                    <li class="table-view-divider">
+                    <li class="table-view-cell" id="review-stars">
                         <span class="icon icon-star"></span>
                         <span class="icon icon-star"></span>
                         <span class="icon icon-star"></span>
                         <span class="icon icon-star"></span>
                         <span class="icon icon-star"></span>
                     </li>
+                    <li>
+                        <div class="content-padded">
+                            <button class="btn btn-block btn-negative" id="btn-delete-review">
+                                <span class="icon icon-trash"></span>
+                                Delete
+                            </button>
+                        </div>
+                    </li>
                 </ul>
-                <div class="content-padded">
-                    <button class="btn-outlined btn-block btn-negative" id="btn-delete-review">
-                        <span class="icon icon-trash"></span>
-                        Delete
-                    </button>
-                </div>
             </div>
         </div>
     </div>

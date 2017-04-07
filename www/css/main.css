@@ -13,25 +13,6 @@ body{
     background: #ECE9E6;
 }
 
-span.name{
-    float:left;
-    width: 60%;
-    font-size: 0.9rem;
-    overflow: hidden;
-    color: #333;
-}
-span.dob{
-    font-size: 0.7rem;
-    color: #333;
-}
-.midline{
-    position: absolute;
-    top: 40%;
-    right: 5%;
-    color: #2F0743;
-    font-weight: 500;
-}
-
 .media-body {
     color: #333333;
     font-weight: 700;
@@ -41,14 +22,14 @@ span.dob{
     font-weight: normal;
 }
 
-a {
-    color: #600a96;
-}
+/*.table-view {*/
+    /*background-color: #d5d5d5;  !* fallback for old browsers *!*/
+/*}*/
 
 .title {
-    background: #41295a; /* fallback for old browsers */
-    background: -webkit-linear-gradient(to left, #41295a , #2F0743); /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to left, #41295a , #2F0743); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: #005C97;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #363795, #005C97);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #363795, #005C97); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
     color: #FFFFFF;
 }
 
@@ -58,15 +39,21 @@ a {
 }
 
 .navigate-left:after, .navigate-right:after, .push-left:after, .push-right:after {
-    color: #c3aacf;
+    color: #333333;
 }
 
 .content {
-    background: #ECE9E6; /* fallback for old browsers */
-    background: -webkit-linear-gradient(to left, #ECE9E6 , #FFFFFF); /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to left, #ECE9E6 , #FFFFFF); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#f6f8f9+0,e5ebee+37,d7dee3+67,f5f7f9+100 */
+    background: rgb(246,248,249); /* Old browsers */
+    background: -moz-linear-gradient(-45deg,  rgba(246,248,249,1) 0%, rgba(229,235,238,1) 37%, rgba(215,222,227,1) 67%, rgba(245,247,249,1) 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(-45deg,  rgba(246,248,249,1) 0%,rgba(229,235,238,1) 37%,rgba(215,222,227,1) 67%,rgba(245,247,249,1) 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(135deg,  rgba(246,248,249,1) 0%,rgba(229,235,238,1) 37%,rgba(215,222,227,1) 67%,rgba(245,247,249,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f6f8f9', endColorstr='#f5f7f9',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 }
 
+.input-row {
+    height: 45px;
+}
 .input-row label {
     color: #333333;
 }
@@ -75,24 +62,56 @@ a {
     color: #2F0743;
 }
 
-#btn-del-person {
-    display: none;
+.navigate-right:after, .push-right:after {
+    content: '\e80d';
 }
 
-#add-person .icon.icon-plus,
-#add-gift .icon.icon-plus,
-#close-modal-person,
-#close-modal-gift {
-    padding-right: 10px;
-    font-weight: 900;
-}
-
-#back-people .icon.icon-left-nav {
-    padding-left: 10px;
-    font-weight: 400;
-}
-
-#name-person {
+.table-view-divider {
     text-align: center;
-    color: #41295a;
+    color: #FFFFFF;
+    background: #517fa4;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #243949, #517fa4);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #243949, #517fa4); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+.media-body {
+    color: #517fa4;
+}
+
+.media-body p {
+    padding-top: .3rem;
+    color:  #ffcc33;
+    text-shadow: 1px 1px 1px #333;
+}
+
+.ios-top {
+    margin-top: 30px;
+}
+
+#btn-close-review {
+    background-color: #cccccc;
+}
+
+#rating {
+    padding-right: 32px;
+}
+
+#review-stars,
+#review-img {
+    text-align: center;
+    padding: 11px 0;
+}
+
+#review-img img {
+    min-height: 90%;
+    max-height: 90*;
+    min-width: 90%;
+    max-width: 90%;
+}
+
+#review-stars .icon-star,
+#review-stars .icon-star-filled {
+    font-size: 2.5rem;
+    color: #ffcc33;
+    text-shadow: 1px 1px 3px #333;
 }

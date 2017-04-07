@@ -18,317 +18,346 @@
  */
 "use strict";
 var app = {
-    peopleList: {},
-    currentPage: "",
-    currentPerson: null,
-    // Application Constructor
+    reviewList: {},
+    currentReview: null,
+    key: "straviewr",
+
     initialize: function() {
         (window.device) ?
             document.addEventListener('deviceready', app.onDeviceReady.bind(app), false) :
             document.addEventListener('DOMContentLoaded', app.onDeviceReady.bind(app), false);
-        // document.addEventListener('deviceready', app.onDeviceReady.bind(app), false);
     },
 
     onDeviceReady: function() {
         app.receivedEvent('deviceready');
         window.addEventListener('push', app.pageChanged);
+        if (window.device && window.device.platform.includes("iOS")) {
+            console.log(window.device.platform);
+            document.getElementById("main-bar").classList.add("ios-top");
+        }
     },
 
-    // Update DOM on a Received Event
     receivedEvent: function(id) {
-        console.log('Received Event: ' + id);
-        
         app.currentPage = document.querySelector(".content").id;
-        app.setEventsModalPerson();
+        app.setEventsModal();
     
-        // localStorage.clear();
         try {
-            if (!rscmLib.getLocalStorage().people) {
-                localStorage.clear();
-                rscmLib.setLocalStorage({people:[]});
+            if (!rscmLib.getLocalStorage(app.key).reviews) {
+                rscmLib.setLocalStorage({reviews:[]}, app.key);
             }
         }catch (err){
-            rscmLib.setLocalStorage({people:[]});
+            rscmLib.setLocalStorage({reviews:[]}, app.key);
         }
         
-        app.listPerson();
+        app.listReviews();
     },
     
     pageChanged: function(){
-        //
         app.currentPage = document.querySelector(".content").id;
-        // console.log(app.currentPage);
         switch(app.currentPage) {
-            case 'page-people':
-                // app.setEventsModalPerson();
-                app.currentPerson = null;
-                document.getElementById("add-person").addEventListener("touchstart", app.setEventsModalPerson);
-                app.listPerson();
+            case 'page-reviews':
                 console.log('You are on '.concat(app.currentPage));
-                break;
-            case 'page-gifts':
-                // app.setEventsModalGift();
-                document.getElementById("add-gift").addEventListener("touchstart", app.setEventsModalGift);
-                app.listGifts();
-                console.log('You are on '.concat(app.currentPage));
+                document.getElementById("add-review").addEventListener("touchstart", app.setEventsModal);
+                app.listReviews();
                 break;
             default:
                 console.log('Page 404!')
         }
     },
     
-    setEventsModalPerson: function(){
-        document.getElementById("btn-ok-item").addEventListener("touchstart", app.savePerson);
-        document.getElementById("btn-close-item").addEventListener("touchstart", app.clickBtnClose);
-        document.getElementById("btn-photo-item").addEventListener("touchstart", app.deletePerson);
+    setEventsModal: function(){
+        document.getElementById("btn-ok-review").addEventListener("touchstart", app.saveReview);
+        document.getElementById("btn-close-review").addEventListener("touchstart", app.clickBtnClose);
+        document.getElementById("btn-photo-review").addEventListener("touchstart", app.takePicture);
+        document.getElementById("btn-delete-review").addEventListener("touchstart", app.deleteReview);
+        document.querySelectorAll("#rating .icon").forEach(function (item) {
+            item.addEventListener("touchend", app.setStars);
+        })
     },
     
-    setEventsModalGift: function () {
-        document.getElementById("btn-ok-gift").addEventListener("touchstart", app.saveGift);
-        document.getElementById("btn-close-gift").addEventListener("touchstart", app.clickBtnClose);
+    listReviews: function () {
+        let ul = document.getElementById("review-list");
+        ul.innerHTML = "";
+    
+        app.reviewList = rscmLib.getLocalStorage(app.key) || {"reviews": []};
+        console.log(app.reviewList);
+        app.reviewList.reviews.forEach(function (review) {
+            let li = rscmLib.createNewDOM({type: "li"   , class: "table-view-cell media", "data-id":review.id});
+            let a1 = rscmLib.createNewDOM({type: "a"    , class: "navigate-right", href: "#itemReview"});
+            let im = rscmLib.createNewDOM({type: "img"  , class: "media-object pull-left", src: (review.img || "http://placehold.it/96x96")});
+            let d1 = rscmLib.createNewDOM({type: "div"  , class: "media-body", innerHTML: review.name});
+            let p1 = rscmLib.createNewDOM({type: "p"    });
+            let s1 = rscmLib.createNewDOM({type: "span" , class: "icon ".concat((review.rating >= 1) ? "icon-star-filled" : "icon-star")});
+            let s2 = rscmLib.createNewDOM({type: "span" , class: "icon ".concat((review.rating >= 2) ? "icon-star-filled" : "icon-star")});
+            let s3 = rscmLib.createNewDOM({type: "span" , class: "icon ".concat((review.rating >= 3) ? "icon-star-filled" : "icon-star")});
+            let s4 = rscmLib.createNewDOM({type: "span" , class: "icon ".concat((review.rating >= 4) ? "icon-star-filled" : "icon-star")});
+            let s5 = rscmLib.createNewDOM({type: "span" , class: "icon ".concat((review.rating >= 5) ? "icon-star-filled" : "icon-star")});
+            p1.appendChild(s1);
+            p1.appendChild(s2);
+            p1.appendChild(s3);
+            p1.appendChild(s4);
+            p1.appendChild(s5);
+            d1.appendChild(p1);
+            a1.appendChild(im);
+            a1.appendChild(d1);
+            li.appendChild(a1);
+            ul.appendChild(li);
+            a1.addEventListener("touchstart", app.showReview);
+        });
+        (ul.innerHTML === "") ? ul.parentNode.style.display = "none" : ul.parentNode.style.display = "block";
+    },
+    
+    saveReview: function (ev) {
+        ev.preventDefault();
+        app.reviewList = rscmLib.getLocalStorage(app.key) || {"reviews":[]};
+        let stars = 0;
+        try {
+            stars = document.querySelectorAll("#rating .icon-star-filled").length;
+        } catch (err) {
+            stars = 0;
+        }
+        if (app.reviewList || ""){
+            console.log("edit");
+            let indexReview = app.reviewList.reviews.findIndex(function (rev) {
+                return rev.id == app.currentReview;
+            });
+            if (indexReview > -1) {
+                app.reviewList.reviews[indexReview].name = document.getElementById("name").value.initCap();
+                app.reviewList.reviews[indexReview].rating = stars;
+                rscmLib.setLocalStorage(app.reviewList, ap.key);
+                app.reviewList = rscmLib.getLocalStorage(app.key);
+                app.currentReview = null;
+            } else {
+                app.reviewList.reviews.push({
+                    "id": Date.now(),
+                    "name": document.getElementById("name").value.initCap(),
+                    "rating": stars,
+                    "img": ""
+                });
+                rscmLib.setLocalStorage(app.reviewList, app.key);
+            }
+        }
+        let myClick = new CustomEvent('touchend', { bubbles: true, cancelable: true });
+        document.querySelector("#close-modal-add").dispatchEvent(myClick);
+        app.listReviews();
+        document.querySelector(".input-group").reset();
+        for (let i=0; i < stars; i++){
+            document.querySelectorAll("#rating .icon")[i].classList.remove("icon-star-filled");
+            document.querySelectorAll("#rating .icon")[i].classList.add("icon-star");
+        }
+        app.currentReview = 0;
+        document.getElementById("btn-ok-review").removeEventListener("touchstart", app.saveReview);
+    },
+    
+    editReview: function (ev) {
+        document.getElementById("add-review").addEventListener("touchstart", app.setEventsModal);
+        app.setEventsModal();
+        let review = app.getReview(ev.target.parentNode.getAttribute("data-id"));
+        document.getElementById("name").value = review[0].name;
+        let stars = (review[0].rating || 0) ? review[0].rating : 0;
+        for (let i=1; i < stars+1; i++){
+            document.querySelectorAll("#rating .icon-star")[i].classList.remove("icon-star");
+            document.querySelectorAll("#rating .icon-star")[i].classList.add("icon-star-filled");
+        }
+        app.currentReview = review[0].id;
+    },
+    
+    deleteReview:  function () {
+        let newList = app.reviewList.reviews.filter(function (rev) {
+            return rev.id !== app.currentReview;
+        });
+        console.log(app.currentReview);
+        rscmLib.setLocalStorage({reviews: newList}, app.key);
+        app.reviewList = rscmLib.getLocalStorage(app.key);
+        let myClick = new CustomEvent('touchend', { bubbles: true, cancelable: true });
+        document.querySelector("#close-modal-review").dispatchEvent(myClick);
+        app.listReviews();
+        app.currentReview = null;
+        document.querySelector(".input-group").reset();
+        document.getElementById("name").blur();
+        document.getElementById("btn-delete-review").removeEventListener("touchstart", app.deleteReview);
+    },
+    
+    showReview: function (ev) {
+        let exit = false;
+        let target = ev.target;
+        // console.log(document.getElementById("review_name"));
+        while (!exit) {
+            if (target.getAttribute("data-id")){
+                console.log(target);
+                let review = app.getReview(target.getAttribute("data-id"));
+                document.getElementById("review_name").innerHTML = review[0].name;
+                let stars = (review[0].rating || 0) ? review[0].rating : 0;
+                // console.log(stars);
+                for (var i=0; i<5; i++) {
+                    if (i < parseInt(stars)) {
+                        document.querySelectorAll("#review-stars .icon")[i].classList.remove("icon-star");
+                        document.querySelectorAll("#review-stars .icon")[i].classList.add("icon-star-filled");
+                    } else {
+                        document.querySelectorAll("#review-stars .icon")[i].classList.remove("icon-star-filled");
+                        document.querySelectorAll("#review-stars .icon")[i].classList.add("icon-star");
+                    }
+                }
+                app.currentReview = review[0].id;
+                exit = true;
+    
+            } else {
+                target = target.parentNode;
+            }
+        }
+        app.setEventsModal();
     },
 
-    listPerson: function () {
-        let ul = document.getElementById("item-list");
-        ul.innerHTML = "";
-    
-        app.peopleList = rscmLib.getLocalStorage() || {"people": []};
-        console.log(app.peopleList);
-        if (app.peopleList.people.length > 1){
-            app.peopleList.people.sort(function (a,b) {
-                return (moment(a.dob,"MMMM Do YYYY") > moment(b.dob,"MMMM Do YYYY")) ? 1 :
-                       (moment(a.dob,"MMMM Do YYYY") < moment(b.dob,"MMMM Do YYYY")) ? -1 : 0;
-            });
-        }
-    
-        app.peopleList.people.forEach(function (person) {
-            //
-            // let dob = moment(person.dob).
-            //
-            let li = rscmLib.createNewDOM({type: "li"   , class: "table-view-cell media", "data-id":person.id});
-            let s1 = rscmLib.createNewDOM({type: "span" , class: "name"});
-            let a1 = rscmLib.createNewDOM({type: "a"    , class: "edit-person", innerHTML: person.fullName, href: "#newItem"});
-            let a2 = rscmLib.createNewDOM({type: "a"    , class: "navigate-right pull-right", href: "#itemReview"});
-            let s2 = rscmLib.createNewDOM({type: "span" , class: "dob", innerHTML: person.dob });
-            //
-            s1.appendChild(a1);
-            a2.appendChild(s2);
-            li.appendChild(s1);
-            li.appendChild(a2);
-            ul.appendChild(li);
-            //
-            a1.addEventListener("touchstart", app.editPerson);
-        
-            a2.addEventListener("touchstart", app.goGifts);
-            //
+    getReview: function (id) {
+        return app.reviewList.reviews.filter(function (rev) {
+            return rev.id.toString() === id;
         });
-        (ul.innerHTML === "") ? ul.parentNode.style.display = "none" : ul.parentNode.style.display = "block";
     },
-    
-    savePerson: function (ev) {
-        ev.preventDefault();
-        //
-        console.log(app.currentPerson);
-        //
-        if (!(document.getElementById("fullName").value || "") || (document.getElementById("fullName").value === null)) {
-            document.getElementById("fullName").value = "*** Set a Name ***";
-        }
-        if (!(document.getElementById("dateBirth").value || "") || (document.getElementById("dateBirth").value === null)) {
-            document.getElementById("dateBirth").value = "1900-01-01";
-        }
-        app.peopleList = rscmLib.getLocalStorage() || {"people":[]};
-        if (app.currentPerson || ""){
-            //
-            let indexPerson = app.peopleList.people.findIndex(function (peep) {
-                return peep.id == app.currentPerson;
-            });
-            if (indexPerson > -1) {
-                app.peopleList.people[indexPerson].fullName = document.getElementById("fullName").value.initCap();
-                app.peopleList.people[indexPerson].dob = moment(document.getElementById("dateBirth").value).format("MMMM Do YYYY");
-                rscmLib.setLocalStorage(app.peopleList);
-                app.peopleList = rscmLib.getLocalStorage();
-                app.currentPerson = null;
-            }
-            //
-        } else {
-            //
-            let person = {"id": Date.now(),
-                "fullName": document.getElementById("fullName").value.initCap(),
-                "dob": moment(document.getElementById("dateBirth").value).format("MMMM Do YYYY"),
-                "ideas":[]};
-            // console.log(app.peopleList);
-            app.peopleList.people.push(person);
-            rscmLib.setLocalStorage(app.peopleList);
-            //
-        }
-        //
-        let myClick = new CustomEvent('touchend', { bubbles: true, cancelable: true });
-        document.querySelector("#close-modal-person").dispatchEvent(myClick);
-        //
-        app.listPerson();
-        //
-        document.querySelector(".input-group").reset();
-        document.getElementById("btn-ok-person").removeEventListener("touchstart", app.savePerson);
-    },
-    
-    editPerson: function (ev) {
-        //
-        document.getElementById("add-person").addEventListener("touchstart", app.setEventsModalPerson);
-        app.setEventsModalPerson();
-        document.getElementById("btn-del-person").style.display = "block";
-        //
-        let personEdit = app.getPerson(ev.target.parentNode.parentNode.getAttribute("data-id"));
-        document.getElementById("fullName").value = personEdit[0].fullName;
-        document.getElementById("dateBirth").value = moment(personEdit[0].dob,"MMMM Do YYYY").format("YYYY-MM-DD");
-        app.currentPerson = personEdit[0].id;
-        //
-    },
-    
-    deletePerson:  function () {
-        console.log("deletePerson");
-        let newList = app.peopleList.people.filter(function (person) {
-            return person.id !== app.currentPerson;
-        });
-        console.log(newList);
-        rscmLib.setLocalStorage({people: newList});
-        app.peopleList = rscmLib.getLocalStorage();
-        //
-        let myClick = new CustomEvent('touchend', { bubbles: true, cancelable: true });
-        document.querySelector("#close-modal-person").dispatchEvent(myClick);
-        //
-        app.listPerson();
-        //
-        app.currentPerson = null;
-        document.querySelector(".input-group").reset();
-        document.getElementById("dateBirth").blur();
-        document.getElementById("fullName").blur();
-        document.getElementById("btn-del-person").removeEventListener("touchstart", app.deletePerson);
-    },
-    
-    goGifts: function (ev) {
-        //
-        console.log(ev.target.nodeName);
-        if (ev.target.nodeName === "SPAN") {
-            app.currentPerson = ev.target.parentNode.parentNode.getAttribute("data-id");
-            return;
-        }
-        app.currentPerson = ev.target.parentNode.getAttribute("data-id");
-        //
-    },
-    
-    listGifts: function () {
-        //
-        let person = app.getPerson(app.currentPerson);
-        let ul = document.getElementById("gift-list");
-        ul.innerHTML = "";
-        //
-        // person[0].ideas.sort(function (a,b) {
-        //     return (a.idea > b.idea) ? 1 : (a.idea < b.idea) ? -1 : 0;
-        // }).forEach(function (gift, index) {
-        //     //
-        //     let li = rscmLib.createNewDOM({type: "li"   , class: "table-view-cell media"});
-        //     let s1 = rscmLib.createNewDOM({type: "span" , class: "pull-right icon icon-trash midline", "data-id":index});
-        //     let dv = rscmLib.createNewDOM({type: "div"  , class: "media-body", innerHTML: gift.idea});
-        //     let p1 = rscmLib.createNewDOM({type: "p"    , innerHTML: gift.at});
-        //     let p2 = rscmLib.createNewDOM({type: "p"    });
-        //     let p3 = rscmLib.createNewDOM({type: "p"    , innerHTML: gift.cost});
-        //     let a1 = rscmLib.createNewDOM({type: "a"    , href: "http://".concat(gift.url), target: "_blank", innerHTML: gift.url});
-        //     //
-        //     p2.appendChild(a1);
-        //     dv.appendChild(p1);
-        //     dv.appendChild(p2);
-        //     dv.appendChild(p3);
-        //     li.appendChild(s1);
-        //     li.appendChild(dv);
-        //     ul.appendChild(li);
-        //     //
-        //     s1.addEventListener("touchend", app.deleteGift);
-        //     //
-        // });
-        document.getElementById("name-person").innerHTML = person[0].fullName;
-        (ul.innerHTML === "") ? ul.parentNode.style.display = "none" : ul.parentNode.style.display = "block";
-    },
-    
-    saveGift: function(ev){
-        ev.preventDefault();
-        //
-        if (!(document.getElementById("ideaDesc").value || "") || (document.getElementById("ideaDesc").value === null)) {
-            document.getElementById("ideaDesc").value = "*** Set the Idea Name ***";
-        }
-        let person = app.getPerson(app.currentPerson);
-        let gift = {"idea": document.getElementById("ideaDesc").value.initCap(),
-                    "at": document.getElementById("store").value.initCap(),
-                    "cost": app.validatePrice(document.getElementById("cost").value),
-                    "url": document.getElementById("url").value.toLowerCase()};
-        for (var i=0, size=app.peopleList.people.length; i<size; i++){
-            if (app.peopleList.people[i].id === person[0].id) {
-                app.peopleList.people[i].ideas.push(gift);
-                break;
-            }
-        }
-        rscmLib.setLocalStorage(app.peopleList);
-        //
-        document.querySelector(".input-group").reset();
-        let myClick = new CustomEvent('touchend', { bubbles: true, cancelable: true });
-        document.getElementById("close-modal-gift").dispatchEvent(myClick);
-        //
-        app.listGifts();
-        //
-        document.getElementById("btn-ok-gift").removeEventListener("touchstart", app.saveGift);
-    },
-    
-    deleteGift: function (ev) {
-        let person = app.getPerson(app.currentPerson);
-        for (var i=0, size=app.peopleList.people.length; i<size; i++){
-            if (app.peopleList.people[i].id === person[0].id) {
-                app.peopleList.people[i].ideas = app.peopleList.people[i].ideas.filter(function (gift, index) {
-                    return index.toString() !== ev.currentTarget.getAttribute("data-id");
-                });
-                break;
-            }
-        }
-        rscmLib.setLocalStorage(app.peopleList);
-        //
-        app.listGifts();
-        //
-    },
-    
+
     clickBtnClose: function (){
         let myClick = new CustomEvent('touchend', { bubbles: true, cancelable: true });
-        try{
-            document.getElementById("close-modal-person").dispatchEvent(myClick);
-            document.getElementById("btn-close-person").removeEventListener("touchstart", app.clickBtnClose);
-            document.querySelector(".input-group").reset();
-            app.currentPerson = null;
-        }catch (err){
-            document.getElementById("close-modal-gift").dispatchEvent(myClick);
-            document.getElementById("btn-close-gift").removeEventListener("touchstart", app.clickBtnClose);
-            document.querySelector(".input-group").reset();
+        document.getElementById("close-modal-add").dispatchEvent(myClick);
+        document.getElementById("btn-close-review").removeEventListener("touchstart", app.clickBtnClose);
+        document.querySelector(".input-group").reset();
+        for (let i=0; i < 5; i++){
+            document.querySelectorAll("#rating .icon")[i].classList.remove("icon-star-filled");
+            document.querySelectorAll("#rating .icon")[i].classList.add("icon-star");
         }
+        app.currentReview = 0;
     },
     
-    getPerson: function (id) {
-        // console.log(id);
-        return app.peopleList.people.filter(function (person) {
-            return person.id.toString() === id;
-        });
+    takePicture: function () {
+    
     },
     
-    validatePrice: function(value) {
-        let textVal = value;
-        textVal = textVal.replace(/,/g, "");
-        if (!textVal.includes("$")){
-            textVal = "$".concat(textVal);
+    setStars: function (ev) {
+        if (document.querySelectorAll("#rating .icon-star-filled").length === 1 &&
+            parseInt(ev.target.getAttribute("data-id")) === 1){
+            ev.target.classList.remove("icon-star-filled");
+            ev.target.classList.add("icon-star");
+        } else {
+            for (var i=0; i<5; i++){
+                if (i < parseInt(ev.target.getAttribute("data-id"))) {
+                    document.querySelectorAll("#rating .icon")[i].classList.remove("icon-star");
+                    document.querySelectorAll("#rating .icon")[i].classList.add("icon-star-filled");
+                } else {
+                    document.querySelectorAll("#rating .icon")[i].classList.remove("icon-star-filled");
+                    document.querySelectorAll("#rating .icon")[i].classList.add("icon-star");
+                }
+            }
         }
-        if (!textVal.includes(".")){
-            textVal += ".00";
-        }
-        let regex = /^(\$|)([1-9]\d{0,2}(\,\d{3})*|([1-9]\d*))(\.\d{2})?$/;
-        let passed = textVal.match(regex);
-        return (passed == null) ? "" // alert("Enter price only. For example: 523.36 or $523.36");
-                                : textVal;
     }
-
+    
 };
 
 app.initialize();
+
+
+// setEventsModalGift: function () {
+//     document.getElementById("btn-ok-gift").addEventListener("touchstart", app.saveGift);
+//     document.getElementById("btn-close-gift").addEventListener("touchstart", app.clickBtnClose);
+// },
+//
+// goGifts: function (ev) {
+//     //
+//     console.log(ev.target.nodeName);
+//     if (ev.target.nodeName === "SPAN") {
+//         app.currentPerson = ev.target.parentNode.parentNode.getAttribute("data-id");
+//         return;
+//     }
+//     app.currentPerson = ev.target.parentNode.getAttribute("data-id");
+//     //
+// },
+//
+// listGifts: function () {
+//     //
+//     let person = app.getPerson(app.currentPerson);
+//     let ul = document.getElementById("gift-list");
+//     ul.innerHTML = "";
+//     //
+//     // person[0].ideas.sort(function (a,b) {
+//     //     return (a.idea > b.idea) ? 1 : (a.idea < b.idea) ? -1 : 0;
+//     // }).forEach(function (gift, index) {
+//     //     //
+//     //     let li = rscmLib.createNewDOM({type: "li"   , class: "table-view-cell media"});
+//     //     let s1 = rscmLib.createNewDOM({type: "span" , class: "pull-right icon icon-trash midline", "data-id":index});
+//     //     let dv = rscmLib.createNewDOM({type: "div"  , class: "media-body", innerHTML: gift.idea});
+//     //     let p1 = rscmLib.createNewDOM({type: "p"    , innerHTML: gift.at});
+//     //     let p2 = rscmLib.createNewDOM({type: "p"    });
+//     //     let p3 = rscmLib.createNewDOM({type: "p"    , innerHTML: gift.cost});
+//     //     let a1 = rscmLib.createNewDOM({type: "a"    , href: "http://".concat(gift.url), target: "_blank", innerHTML: gift.url});
+//     //     //
+//     //     p2.appendChild(a1);
+//     //     dv.appendChild(p1);
+//     //     dv.appendChild(p2);
+//     //     dv.appendChild(p3);
+//     //     li.appendChild(s1);
+//     //     li.appendChild(dv);
+//     //     ul.appendChild(li);
+//     //     //
+//     //     s1.addEventListener("touchend", app.deleteGift);
+//     //     //
+//     // });
+//     document.getElementById("name-person").innerHTML = person[0].fullName;
+//     (ul.innerHTML === "") ? ul.parentNode.style.display = "none" : ul.parentNode.style.display = "block";
+// },
+//
+// saveGift: function(ev){
+//     ev.preventDefault();
+//     //
+//     if (!(document.getElementById("ideaDesc").value || "") || (document.getElementById("ideaDesc").value === null)) {
+//         document.getElementById("ideaDesc").value = "*** Set the Idea Name ***";
+//     }
+//     let person = app.getPerson(app.currentPerson);
+//     let gift = {"idea": document.getElementById("ideaDesc").value.initCap(),
+//         "at": document.getElementById("store").value.initCap(),
+//         "cost": app.validatePrice(document.getElementById("cost").value),
+//         "url": document.getElementById("url").value.toLowerCase()};
+//     for (var i=0, size=app.peopleList.people.length; i<size; i++){
+//         if (app.peopleList.people[i].id === person[0].id) {
+//             app.peopleList.people[i].ideas.push(gift);
+//             break;
+//         }
+//     }
+//     rscmLib.setLocalStorage(app.peopleList);
+//     //
+//     document.querySelector(".input-group").reset();
+//     let myClick = new CustomEvent('touchend', { bubbles: true, cancelable: true });
+//     document.getElementById("close-modal-gift").dispatchEvent(myClick);
+//     //
+//     app.listGifts();
+//     //
+//     document.getElementById("btn-ok-gift").removeEventListener("touchstart", app.saveGift);
+// },
+//
+// deleteGift: function (ev) {
+//     let person = app.getPerson(app.currentPerson);
+//     for (var i=0, size=app.peopleList.people.length; i<size; i++){
+//         if (app.peopleList.people[i].id === person[0].id) {
+//             app.peopleList.people[i].ideas = app.peopleList.people[i].ideas.filter(function (gift, index) {
+//                 return index.toString() !== ev.currentTarget.getAttribute("data-id");
+//             });
+//             break;
+//         }
+//     }
+//     rscmLib.setLocalStorage(app.peopleList);
+//     //
+//     app.listGifts();
+//     //
+// },
+//
+// validatePrice: function(value) {
+//     let textVal = value;
+//     textVal = textVal.replace(/,/g, "");
+//     if (!textVal.includes("$")){
+//         textVal = "$".concat(textVal);
+//     }
+//     if (!textVal.includes(".")){
+//         textVal += ".00";
+//     }
+//     let regex = /^(\$|)([1-9]\d{0,2}(\,\d{3})*|([1-9]\d*))(\.\d{2})?$/;
+//     let passed = textVal.match(regex);
+//     return (passed == null) ? "" // alert("Enter price only. For example: 523.36 or $523.36");
+//         : textVal;
+// }
+
