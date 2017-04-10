@@ -23,17 +23,13 @@ var app = {
     key: "straviewr",
 
     initialize: function() {
-        console.log("init");
         (rscmLib.getMobileOperatingSystem() !== "unknown") ?
             document.addEventListener('deviceready', app.onDeviceReady.bind(app), false) :
             document.addEventListener('DOMContentLoaded', app.onDeviceReady.bind(app), false);
     },
 
     onDeviceReady: function() {
-        console.log("deviceready");
-    
         document.getElementById("add-review").addEventListener("touchstart", app.setEventsModal);
-    
         try {
             if (!rscmLib.getLocalStorage(app.key).reviews) {
                 rscmLib.setLocalStorage({reviews:[]}, app.key);
@@ -41,7 +37,6 @@ var app = {
         }catch (err){
             rscmLib.setLocalStorage({reviews:[]}, app.key);
         }
-    
         app.refreshIOS();
         app.setEventsModal();
         app.listReviews();
@@ -50,8 +45,7 @@ var app = {
     setEventsModal: function(){
         document.getElementById("btn-photo-review").style.display = "block";
         if (document.getElementById("newImage") || "") {
-            console.log(document.getElementById("newImage").parentNode)
-            // document.getElementById("newImage").parentNode.removeChild(document.getElementById("newImage").childNodes[1]);
+            document.getElementById("review-form").removeChild(document.getElementById("newImage").parentNode);
         }
         document.getElementById("btn-ok-review").addEventListener("touchstart", app.saveReview);
         document.getElementById("btn-close-review").addEventListener("touchstart", app.clickBtnClose);
@@ -66,9 +60,7 @@ var app = {
     listReviews: function () {
         let ul = document.getElementById("review-list");
         ul.innerHTML = "";
-    
         app.reviewList = rscmLib.getLocalStorage(app.key) || {"reviews": []};
-        console.log(app.reviewList);
         app.reviewList.reviews.forEach(function (review) {
             let li = rscmLib.createNewDOM({type: "li"   , class: "table-view-cell media", "data-id":review.id});
             let a1 = rscmLib.createNewDOM({type: "a"    , class: "navigate-right", href: "#itemReview"});
@@ -104,26 +96,13 @@ var app = {
         } catch (err) {
             stars = 0;
         }
-        if (app.reviewList || ""){
-            let indexReview = app.reviewList.reviews.findIndex(function (rev) {
-                return rev.id == app.currentReview;
-            });
-            if (indexReview > -1) { //edit
-                app.reviewList.reviews[indexReview].name = document.getElementById("name").value.initCap();
-                app.reviewList.reviews[indexReview].rating = stars;
-                rscmLib.setLocalStorage(app.reviewList, ap.key);
-                app.reviewList = rscmLib.getLocalStorage(app.key);
-                app.currentReview = null;
-            } else {
-                app.reviewList.reviews.push({
-                    "id": Date.now(),
-                    "name": document.getElementById("name").value.initCap(),
-                    "rating": stars,
-                    "img": (document.getElementById("newImage")) ? document.getElementById("newImage").getAttribute("src") : ""
-                });
-                rscmLib.setLocalStorage(app.reviewList, app.key);
-            }
-        }
+        app.reviewList.reviews.push({
+            "id": Date.now(),
+            "name": document.getElementById("name").value.initCap(),
+            "rating": stars,
+            "img": (document.getElementById("newImage")) ? document.getElementById("newImage").getAttribute("src") : ""
+        });
+        rscmLib.setLocalStorage(app.reviewList, app.key);
         let myClick = new CustomEvent('touchend', { bubbles: true, cancelable: true });
         document.querySelector("#close-modal-add").dispatchEvent(myClick);
         app.listReviews();
@@ -133,7 +112,6 @@ var app = {
             document.querySelectorAll("#rating .icon")[i].classList.add("icon-star");
         }
         app.currentReview = 0;
-        // document.getElementById("btn-ok-review").removeEventListener("touchstart", app.saveReview);
     },
     
     editReview: function (ev) {
@@ -153,7 +131,6 @@ var app = {
         let newList = app.reviewList.reviews.filter(function (rev) {
             return rev.id !== app.currentReview;
         });
-        console.log(app.currentReview);
         rscmLib.setLocalStorage({reviews: newList}, app.key);
         app.reviewList = rscmLib.getLocalStorage(app.key);
         let myClick = new CustomEvent('touchend', { bubbles: true, cancelable: true });
@@ -162,20 +139,16 @@ var app = {
         app.currentReview = null;
         document.querySelector(".input-group").reset();
         document.getElementById("name").blur();
-        // document.getElementById("btn-delete-review").removeEventListener("touchstart", app.deleteReview);
     },
     
     showReview: function (ev) {
         let exit = false;
         let target = ev.target;
-        // console.log(document.getElementById("review_name"));
         while (!exit) {
             if (target.getAttribute("data-id")){
-                console.log(target);
                 let review = app.getReview(target.getAttribute("data-id"));
                 document.getElementById("review_name").innerHTML = review[0].name;
                 let stars = (review[0].rating || 0) ? review[0].rating : 0;
-                // console.log(stars);
                 for (var i=0; i<5; i++) {
                     if (i < parseInt(stars)) {
                         document.querySelectorAll("#review-stars .icon")[i].classList.remove("icon-star");
@@ -185,6 +158,7 @@ var app = {
                         document.querySelectorAll("#review-stars .icon")[i].classList.add("icon-star");
                     }
                 }
+                document.querySelector("#review-img img").setAttribute("src", review[0].img);
                 app.currentReview = review[0].id;
                 exit = true;
     
@@ -215,23 +189,42 @@ var app = {
     takePicture: function () {
         var options = {
             quality: 80,
-            destinationType: Camera.DestinationType.NATIVE_URI,
+            // destinationType: Camera.DestinationType.FILE_URI,
+            // destinationType: Camera.DestinationType.NATIVE_URI,
+            destinationType: Camera.DestinationType.DATA_URL,
             encodingType: Camera.EncodingType.PNG,
             mediaType: Camera.MediaType.PICTURE,
             pictureSourceType: Camera.PictureSourceType.CAMERA,
             allowEdit: true,
             targetWidth: 300,
             targetHeight: 300
-        }
+        };
         
         function onSuccess(imageURI) {
-            let im = rscmLib.createNewDOM({type:"img", src:imageURI, id:"newImage"});
-            let li = rscmLib.createNewDOM({type:"li", class:"table-view-cell"});
+            // imageURI.substr(imageURI.lastIndexOf('/') + 1);
+            let im = rscmLib.createNewDOM({type:"img", src:"data:image/jpeg;base64," + imageURI, id:"newImage"});
+            let li = rscmLib.createNewDOM({type:"li", class:"table-view-cell", id:"li-img"});
             li.appendChild(im);
             document.getElementById("review-form").appendChild(li);
             document.getElementById("btn-photo-review").style.display = "none";
+
+            // resolveLocalFileSystemURL(imageURI, function(fileEntry) {
+            //     fileEntry.file(function(file) {
+            //         var reader = new FileReader();
+            //         reader.onloadend = function(event) {
+            //             console.log(event.target.result.byteLength);
+            //         };
+            //         console.log('Reading file: ' + JSON.stringify(file));
+            //         reader.readAsArrayBuffer(file);
+            //         let im = rscmLib.createNewDOM({type:"img", src:file.name, id:"newImage"});
+            //         let li = rscmLib.createNewDOM({type:"li", class:"table-view-cell"});
+            //         li.appendChild(im);
+            //         document.getElementById("review-form").appendChild(li);
+            //         document.getElementById("btn-photo-review").style.display = "none";
+            //     });
+            // });
         }
-    
+        
         function onFail(message) {
             alert('Failed because: ' + message);
         }
@@ -273,113 +266,3 @@ var app = {
 };
 
 app.initialize();
-
-
-// setEventsModalGift: function () {
-//     document.getElementById("btn-ok-gift").addEventListener("touchstart", app.saveGift);
-//     document.getElementById("btn-close-gift").addEventListener("touchstart", app.clickBtnClose);
-// },
-//
-// goGifts: function (ev) {
-//     //
-//     console.log(ev.target.nodeName);
-//     if (ev.target.nodeName === "SPAN") {
-//         app.currentPerson = ev.target.parentNode.parentNode.getAttribute("data-id");
-//         return;
-//     }
-//     app.currentPerson = ev.target.parentNode.getAttribute("data-id");
-//     //
-// },
-//
-// listGifts: function () {
-//     //
-//     let person = app.getPerson(app.currentPerson);
-//     let ul = document.getElementById("gift-list");
-//     ul.innerHTML = "";
-//     //
-//     // person[0].ideas.sort(function (a,b) {
-//     //     return (a.idea > b.idea) ? 1 : (a.idea < b.idea) ? -1 : 0;
-//     // }).forEach(function (gift, index) {
-//     //     //
-//     //     let li = rscmLib.createNewDOM({type: "li"   , class: "table-view-cell media"});
-//     //     let s1 = rscmLib.createNewDOM({type: "span" , class: "pull-right icon icon-trash midline", "data-id":index});
-//     //     let dv = rscmLib.createNewDOM({type: "div"  , class: "media-body", innerHTML: gift.idea});
-//     //     let p1 = rscmLib.createNewDOM({type: "p"    , innerHTML: gift.at});
-//     //     let p2 = rscmLib.createNewDOM({type: "p"    });
-//     //     let p3 = rscmLib.createNewDOM({type: "p"    , innerHTML: gift.cost});
-//     //     let a1 = rscmLib.createNewDOM({type: "a"    , href: "http://".concat(gift.url), target: "_blank", innerHTML: gift.url});
-//     //     //
-//     //     p2.appendChild(a1);
-//     //     dv.appendChild(p1);
-//     //     dv.appendChild(p2);
-//     //     dv.appendChild(p3);
-//     //     li.appendChild(s1);
-//     //     li.appendChild(dv);
-//     //     ul.appendChild(li);
-//     //     //
-//     //     s1.addEventListener("touchend", app.deleteGift);
-//     //     //
-//     // });
-//     document.getElementById("name-person").innerHTML = person[0].fullName;
-//     (ul.innerHTML === "") ? ul.parentNode.style.display = "none" : ul.parentNode.style.display = "block";
-// },
-//
-// saveGift: function(ev){
-//     ev.preventDefault();
-//     //
-//     if (!(document.getElementById("ideaDesc").value || "") || (document.getElementById("ideaDesc").value === null)) {
-//         document.getElementById("ideaDesc").value = "*** Set the Idea Name ***";
-//     }
-//     let person = app.getPerson(app.currentPerson);
-//     let gift = {"idea": document.getElementById("ideaDesc").value.initCap(),
-//         "at": document.getElementById("store").value.initCap(),
-//         "cost": app.validatePrice(document.getElementById("cost").value),
-//         "url": document.getElementById("url").value.toLowerCase()};
-//     for (var i=0, size=app.peopleList.people.length; i<size; i++){
-//         if (app.peopleList.people[i].id === person[0].id) {
-//             app.peopleList.people[i].ideas.push(gift);
-//             break;
-//         }
-//     }
-//     rscmLib.setLocalStorage(app.peopleList);
-//     //
-//     document.querySelector(".input-group").reset();
-//     let myClick = new CustomEvent('touchend', { bubbles: true, cancelable: true });
-//     document.getElementById("close-modal-gift").dispatchEvent(myClick);
-//     //
-//     app.listGifts();
-//     //
-//     document.getElementById("btn-ok-gift").removeEventListener("touchstart", app.saveGift);
-// },
-//
-// deleteGift: function (ev) {
-//     let person = app.getPerson(app.currentPerson);
-//     for (var i=0, size=app.peopleList.people.length; i<size; i++){
-//         if (app.peopleList.people[i].id === person[0].id) {
-//             app.peopleList.people[i].ideas = app.peopleList.people[i].ideas.filter(function (gift, index) {
-//                 return index.toString() !== ev.currentTarget.getAttribute("data-id");
-//             });
-//             break;
-//         }
-//     }
-//     rscmLib.setLocalStorage(app.peopleList);
-//     //
-//     app.listGifts();
-//     //
-// },
-//
-// validatePrice: function(value) {
-//     let textVal = value;
-//     textVal = textVal.replace(/,/g, "");
-//     if (!textVal.includes("$")){
-//         textVal = "$".concat(textVal);
-//     }
-//     if (!textVal.includes(".")){
-//         textVal += ".00";
-//     }
-//     let regex = /^(\$|)([1-9]\d{0,2}(\,\d{3})*|([1-9]\d*))(\.\d{2})?$/;
-//     let passed = textVal.match(regex);
-//     return (passed == null) ? "" // alert("Enter price only. For example: 523.36 or $523.36");
-//         : textVal;
-// }
-

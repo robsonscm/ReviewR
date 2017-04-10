@@ -98,16 +98,21 @@ body{
 }
 
 #rating {
-    /*padding-right: 32px;*/
+    padding-left: 15%;
 }
 
 #review-stars,
-#review-img {
+#review-img,
+#li-img{
     text-align: center;
     padding: 11px 0;
 }
 
-#review-img img,
+#review-img img {
+    /*clip: rect(0px,60px,200px,0px);*/
+    object-fit: cover;
+}
+
 #new-img{
     min-height: 50vh;
     max-height: 50vh;
