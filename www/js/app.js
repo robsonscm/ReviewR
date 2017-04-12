@@ -189,9 +189,9 @@ var app = {
     takePicture: function () {
         var options = {
             quality: 80,
-            // destinationType: Camera.DestinationType.FILE_URI,
+            destinationType: Camera.DestinationType.FILE_URI,
             // destinationType: Camera.DestinationType.NATIVE_URI,
-            destinationType: Camera.DestinationType.DATA_URL,
+            // destinationType: Camera.DestinationType.DATA_URL,
             encodingType: Camera.EncodingType.PNG,
             mediaType: Camera.MediaType.PICTURE,
             pictureSourceType: Camera.PictureSourceType.CAMERA,
@@ -202,7 +202,8 @@ var app = {
         
         function onSuccess(imageURI) {
             // imageURI.substr(imageURI.lastIndexOf('/') + 1);
-            let im = rscmLib.createNewDOM({type:"img", src:"data:image/jpeg;base64," + imageURI, id:"newImage"});
+            // let im = rscmLib.createNewDOM({type:"img", src:"data:image/jpeg;base64," + imageURI, id:"newImage"});
+            let im = rscmLib.createNewDOM({type:"img", src:imageURI, id:"newImage"});
             let li = rscmLib.createNewDOM({type:"li", class:"table-view-cell", id:"li-img"});
             li.appendChild(im);
             document.getElementById("review-form").appendChild(li);

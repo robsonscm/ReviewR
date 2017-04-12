@@ -16,14 +16,21 @@
      KIND, either express or implied.  See the License for the
     specific language governing permissions and limitations
     under the License.
+
+          img-src 'self' data: gap: content: assets-library://asset griffis.edumedia.ca stra0165.edumedia.ca placehold.it placeholdit.imgix.net;
+
 -->
 <html>
 <head>
+    <!--<meta http-equiv="Content-Security-Policy" -->
+          <!--content="default-src 'self' data: gap: 'unsafe-eval';-->
+                   <!--style-src 'self' 'unsafe-inline'; "-->
+    <!--/>-->
+
     <meta http-equiv="Content-Security-Policy"
-          content="default-src 'self' data: gap: https://ssl.gstatic.com https://stra0165.edumedia.ca http://stra0165.edumedia.ca http://placehold.it 'unsafe-eval';
+          content="default-src 'self' data: gap: 'unsafe-eval' https://ssl.gstatic.com griffis.edumedia.ca stra0165.edumedia.ca http://placehold.it http://placeholdit.imgix.net assets-library://asset;
           style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
           media-src *;
-          img-src 'self' data: content: assets-library://asset https://stra0165.edumedia.ca http://stra0165.edumedia.ca https://placehold.it https://placeholdit.imgix.net http://placehold.it http://placeholdit.imgix.net ;
           font-src 'self' https://fonts.gstatic.com data:;">
     <meta name="format-detection" content="telephone=no">
     <meta name="msapplication-tap-highlight" content="no">
